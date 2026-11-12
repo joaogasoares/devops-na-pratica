@@ -1,0 +1,11 @@
+#!/bin/bash
+set -euxo pipefail
+
+dnf install -y docker
+systemctl enable --now docker
+
+REGISTRY=$(echo "${ecr_url}" | cut -d/ -f1)
+aws ecr get-login-password --region ${aws_region} | docker login --username AWS --password-stdin "$REGISTRY"
+
+# Na Fase 1 a imagem é publicada manualmente; o deploy automático entra na fase de CD.
+docker run -d --restart always --name api -p ${app_port}:8000 "${ecr_url}:latest" || true
