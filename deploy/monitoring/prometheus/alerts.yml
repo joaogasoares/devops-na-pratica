@@ -1,0 +1,29 @@
+groups:
+  - name: api-alertas
+    rules:
+      - alert: ApiFora
+        expr: up{job="api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "A API não responde ao Prometheus há mais de 1 minuto"
+
+      - alert: TaxaDeErroAlta
+        expr: |
+          sum(rate(http_requests_total{status=~"5.."}[5m]))
+            / clamp_min(sum(rate(http_requests_total[5m])), 1e-9) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Mais de 5% das requisições retornando erro 5xx"
+
+      - alert: LatenciaAlta
+        expr: |
+          histogram_quantile(0.95, sum by (le) (rate(http_request_duration_seconds_bucket[5m]))) > 0.5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Latência p95 da API acima de 500 ms"

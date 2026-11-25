@@ -2,9 +2,13 @@
 .github
 tests
 infra
+deploy
+docs
+docker-compose.yml
 __pycache__
 *.pyc
 .pytest_cache
 .ruff_cache
 coverage.xml
 .coverage
+*report.xml

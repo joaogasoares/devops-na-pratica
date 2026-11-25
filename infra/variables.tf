@@ -36,7 +36,7 @@ variable "public_subnet_cidrs" {
 variable "instance_type" {
   description = "Tipo da instância EC2 da aplicação"
   type        = string
-  default     = "t3.micro"
+  default     = "t3.small"
 }
 
 variable "app_port" {
@@ -45,8 +45,32 @@ variable "app_port" {
   default     = 8000
 }
 
-variable "allowed_ssh_cidr" {
-  description = "CIDR autorizado a acessar via SSH (use o seu IP/32)"
+variable "admin_cidr" {
+  description = "CIDR autorizado a acessar Grafana (3000) e Prometheus (9090). Use o seu IP/32"
   type        = string
   default     = "127.0.0.1/32"
+}
+
+variable "github_repository" {
+  description = "Repositório no formato usuario/repositorio, autorizado a fazer deploy via OIDC"
+  type        = string
+  default     = "SEU-USUARIO/devops-na-pratica"
+}
+
+variable "create_github_oidc_provider" {
+  description = "Cria o provedor OIDC do GitHub (use false se ele já existir na conta AWS)"
+  type        = bool
+  default     = true
+}
+
+variable "alert_email" {
+  description = "E-mail que recebe os alarmes do CloudWatch (vazio = sem assinatura)"
+  type        = string
+  default     = ""
+}
+
+variable "log_retention_days" {
+  description = "Dias de retenção dos logs no CloudWatch"
+  type        = number
+  default     = 14
 }

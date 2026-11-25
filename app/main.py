@@ -1,11 +1,16 @@
 """API de Tarefas (To-Do) - aplicação de exemplo do projeto DevOps na Prática."""
 
+import os
+
 from fastapi import FastAPI, HTTPException, status
 from pydantic import BaseModel, Field
 
-APP_VERSION = "1.0.0"
+from app.observability import TASKS_STORED, setup_observability
+
+APP_VERSION = os.getenv("APP_VERSION", "2.0.0")
 
 app = FastAPI(title="DevOps na Prática - API de Tarefas", version=APP_VERSION)
+setup_observability(app)
 
 
 class TaskIn(BaseModel):
@@ -27,6 +32,7 @@ def reset_storage() -> None:
     global _next_id
     _tasks.clear()
     _next_id = 1
+    TASKS_STORED.set(0)
 
 
 @app.get("/health")
@@ -45,6 +51,7 @@ def create_task(payload: TaskIn) -> Task:
     task = Task(id=_next_id, **payload.model_dump())
     _tasks[task.id] = task
     _next_id += 1
+    TASKS_STORED.set(len(_tasks))
     return task
 
 
@@ -68,3 +75,4 @@ def update_task(task_id: int, payload: TaskIn) -> Task:
 def delete_task(task_id: int) -> None:
     if _tasks.pop(task_id, None) is None:
         raise HTTPException(status_code=404, detail="Tarefa não encontrada")
+    TASKS_STORED.set(len(_tasks))

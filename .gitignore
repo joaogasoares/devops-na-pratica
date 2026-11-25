@@ -12,3 +12,5 @@ coverage.xml
 .terraform.lock.hcl
 crash.log
 *.tfplan
+test-report.xml
+report.xml

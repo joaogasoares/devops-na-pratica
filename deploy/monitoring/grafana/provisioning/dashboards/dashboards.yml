@@ -1,0 +1,7 @@
+apiVersion: 1
+providers:
+  - name: devops-na-pratica
+    folder: DevOps na Prática
+    type: file
+    options:
+      path: /var/lib/grafana/dashboards

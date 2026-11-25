@@ -1,8 +1,10 @@
 data "aws_availability_zones" "available" {
+  #checkov:skip=CKV_AWS_394:Só as duas primeiras zonas são usadas (índices fixos), novas zonas não alteram a infraestrutura
   state = "available"
 }
 
 resource "aws_vpc" "main" {
+  #checkov:skip=CKV2_AWS_11:VPC Flow Logs ficam como melhoria futura (custo de armazenamento de logs)
   cidr_block           = var.vpc_cidr
   enable_dns_support   = true
   enable_dns_hostnames = true
@@ -16,6 +18,7 @@ resource "aws_internet_gateway" "main" {
 }
 
 resource "aws_subnet" "public" {
+  #checkov:skip=CKV_AWS_130:Subnet pública por design nesta fase (sem NAT/ALB para reduzir custo)
   count                   = length(var.public_subnet_cidrs)
   vpc_id                  = aws_vpc.main.id
   cidr_block              = var.public_subnet_cidrs[count.index]
@@ -40,4 +43,9 @@ resource "aws_route_table_association" "public" {
   count          = length(aws_subnet.public)
   subnet_id      = aws_subnet.public[count.index].id
   route_table_id = aws_route_table.public.id
+}
+
+# Bloqueia todo o tráfego do security group padrão da VPC (boa prática CIS)
+resource "aws_default_security_group" "default" {
+  vpc_id = aws_vpc.main.id
 }

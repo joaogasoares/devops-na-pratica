@@ -1,0 +1,62 @@
+name: Rollback
+
+# Rollback manual em produção (Actions > Rollback > Run workflow).
+# Sem informar a imagem, volta para a versão anterior registrada na EC2.
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: "Tag da imagem no ECR (ex.: 1a2b3c4d5e6f). Vazio = versão anterior"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  rollback:
+    name: Rollback em produção
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: ${{ vars.APP_URL }}
+    env:
+      INSTANCE_ID: ${{ vars.EC2_INSTANCE_ID }}
+      IMAGE_TAG: ${{ inputs.image_tag }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Executar rollback.sh na EC2 via AWS SSM
+        run: |
+          TARGET=""
+          if [ -n "$IMAGE_TAG" ]; then
+            TARGET="${{ vars.ECR_REPOSITORY_URL }}:$IMAGE_TAG"
+          fi
+          PARAMS=$(jq -n --arg target "$TARGET" \
+            '{commands: ["/opt/devops-na-pratica/scripts/rollback.sh \($target)"]}')
+          CMD_ID=$(aws ssm send-command --instance-ids "$INSTANCE_ID" \
+            --document-name AWS-RunShellScript --comment "rollback" \
+            --parameters "$PARAMS" --query Command.CommandId --output text)
+
+          for _ in $(seq 1 60); do
+            STATUS=$(aws ssm get-command-invocation --command-id "$CMD_ID" \
+              --instance-id "$INSTANCE_ID" --query Status --output text 2>/dev/null || echo Pending)
+            case "$STATUS" in
+              Pending|InProgress|Delayed) sleep 10 ;;
+              *) break ;;
+            esac
+          done
+
+          aws ssm get-command-invocation --command-id "$CMD_ID" --instance-id "$INSTANCE_ID" \
+            --query StandardOutputContent --output text
+          [ "$STATUS" = "Success" ]
+
+      - name: Smoke test pela internet
+        run: TENTATIVAS=10 deploy/scripts/smoke_test.sh "${{ vars.APP_URL }}"

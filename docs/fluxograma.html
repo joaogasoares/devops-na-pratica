@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<style>
+  :root {
+    --navy: #3E4080; --navy-soft: #EEEEFC; --gold: #A8884F; --gold-soft: #F7F0E3;
+    --green: #2F7A5E; --green-soft: #E6F3EC; --red: #B5483F; --red-soft: #FBE9E9;
+    --ink: #22243F; --muted: #5C5F80; --line: #8C8EB8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { width: 2400px; height: 1088px; background: #fff; font-family: Arial, Helvetica, sans-serif; color: var(--ink); position: relative; }
+  .wrap { padding: 26px 40px 26px 40px; display: flex; flex-direction: column; gap: 46px; height: 100%; }
+  .lane { display: flex; flex-direction: column; border-radius: 18px; padding: 16px 24px 22px; gap: 12px; flex: 1 1 0; min-height: 0; position: relative; }
+  .lane.ci  { background: #F6F6FE; border: 2px solid #C9CAEC; flex-grow: 1.3; }
+  .lane.cd  { background: #FCF8F0; border: 2px solid #E3D3B3; }
+  .lane.ops { background: #F2F9F5; border: 2px solid #BFDCCD; }
+  .tag { font-weight: 700; font-size: 26px; letter-spacing: .3px; }
+  .ci .tag { color: var(--navy); border-left: 0; }
+  .cd .tag { color: var(--gold); }
+  .ops .tag { color: var(--green); }
+  .tag small { font-weight: 400; font-size: 18px; color: var(--muted); margin-left: 10px; }
+  .steps { display: flex; align-items: center; flex: 1 1 0; min-height: 0; gap: 0; }
+  .step { flex: 1; min-width: 0; background: #fff; border-radius: 14px; padding: 16px 14px 14px; text-align: center;
+          box-shadow: 0 2px 6px rgba(40,40,90,.10); border: 2px solid; height: 100%; display: flex; flex-direction: column; justify-content: center; }
+  .ci .step  { border-color: #9EA0D6; }
+  .cd .step  { border-color: #D4BC8C; }
+  .ops .step { border-color: #96C7AF; }
+  .step .n { font-size: 15px; font-weight: 700; color: #fff; border-radius: 999px; width: 30px; height: 30px; line-height: 30px; margin: 0 auto 8px; }
+  .ci .n { background: var(--navy); } .cd .n { background: var(--gold); } .ops .n { background: var(--green); }
+  .step h3 { font-size: 25px; margin-bottom: 8px; }
+  .step p { font-size: 20px; color: var(--muted); line-height: 1.3; }
+  .step.alt { border-style: dashed; }
+  .step.fail { border-color: var(--red); background: var(--red-soft); }
+  .step.fail .n { background: var(--red); }
+  .arrow { width: 44px; flex: 0 0 44px; display: flex; align-items: center; justify-content: center; }
+  .arrow svg { width: 34px; height: 24px; }
+  .stack { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; height: 100%; }
+  .stack .step { height: auto; flex: 1 1 0; min-height: 0; padding: 4px 10px; }
+  .stack .step h3 { font-size: 22px; margin-bottom: 3px; }
+  .stack .step p { font-size: 18px; }
+  .stack .step .n { display: none; }
+  .stack .step h3::before { content: attr(data-n); display: inline-block; width: 24px; height: 24px; line-height: 24px; border-radius: 999px; color: #fff; font-size: 13px; margin-right: 8px; vertical-align: 2px; }
+  .ci .stack h3::before { background: var(--navy); } .cd .stack h3::before { background: var(--gold); } .cd .stack .fail h3::before { background: var(--red); }
+  .label { position: absolute; font-size: 16px; font-weight: 700; padding: 3px 10px; border-radius: 999px; background: #fff; }
+  svg.overlay { position: absolute; left: 0; top: 0; pointer-events: none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="lane ci" id="lane-ci">
+    <div class="tag">INTEGRAÇÃO CONTÍNUA<small>· todo push e Pull Request</small></div>
+    <div class="steps">
+      <div class="step" id="s-push"><div class="n">1</div><h3>Commit / PR</h3><p>Desenvolvedor envia o código ao GitHub</p></div>
+      <div class="arrow"><svg viewBox="0 0 34 24"><path d="M2 12h26M20 4l9 8-9 8" fill="none" stroke="#3E4080" stroke-width="3"/></svg></div>
+      <div class="step"><div class="n">2</div><h3>Lint</h3><p>ruff check e ruff format</p></div>
+      <div class="arrow"><svg viewBox="0 0 34 24"><path d="M2 12h26M20 4l9 8-9 8" fill="none" stroke="#3E4080" stroke-width="3"/></svg></div>
+      <div class="stack">
+        <div class="step"><div class="n">3</div><h3 data-n="3">Testes</h3><p>pytest · 15 testes · cobertura ≥ 80%</p></div>
+        <div class="step"><div class="n">4</div><h3 data-n="4">SAST e dependências</h3><p>Bandit · pip-audit</p></div>
+        <div class="step"><div class="n">5</div><h3 data-n="5">IaC</h3><p>terraform fmt/validate · Checkov</p></div>
+      </div>
+      <div class="arrow"><svg viewBox="0 0 34 24"><path d="M2 12h26M20 4l9 8-9 8" fill="none" stroke="#3E4080" stroke-width="3"/></svg></div>
+      <div class="step"><div class="n">6</div><h3>Build Docker</h3><p>Imagem multi&#8209;stage, usuário não&#8209;root, tag = SHA do commit</p></div>
+      <div class="arrow"><svg viewBox="0 0 34 24"><path d="M2 12h26M20 4l9 8-9 8" fill="none" stroke="#3E4080" stroke-width="3"/></svg></div>
+      <div class="step"><div class="n">7</div><h3>Scan da imagem</h3><p>Trivy bloqueia vulnerabilidades críticas</p></div>
+      <div class="arrow"><svg viewBox="0 0 34 24"><path d="M2 12h26M20 4l9 8-9 8" fill="none" stroke="#3E4080" stroke-width="3"/></svg></div>
+      <div class="step" id="s-compose"><div class="n">8</div><h3>Docker Compose</h3><p>API + Prometheus + Grafana no runner e smoke test</p></div>
+    </div>
+  </div>
+
+  <div class="lane cd" id="lane-cd">
+    <div class="tag">ENTREGA CONTÍNUA<small>· somente branch main</small></div>
+    <div class="steps">
+      <div class="step" id="s-ecr"><div class="n">9</div><h3>Publicação</h3><p>Imagem enviada ao Amazon ECR (OIDC, sem chaves fixas)</p></div>
+      <div class="arrow"><svg viewBox="0 0 34 24"><path d="M2 12h26M20 4l9 8-9 8" fill="none" stroke="#A8884F" stroke-width="3"/></svg></div>
+      <div class="step"><div class="n">10</div><h3>Aprovação manual</h3><p>Ambiente <i>production</i> no GitHub</p></div>
+      <div class="arrow"><svg viewBox="0 0 34 24"><path d="M2 12h26M20 4l9 8-9 8" fill="none" stroke="#A8884F" stroke-width="3"/></svg></div>
+      <div class="step"><div class="n">11</div><h3>Artefatos no S3</h3><p>Compose, scripts e configs de monitoramento</p></div>
+      <div class="arrow"><svg viewBox="0 0 34 24"><path d="M2 12h26M20 4l9 8-9 8" fill="none" stroke="#A8884F" stroke-width="3"/></svg></div>
+      <div class="step"><div class="n">12</div><h3>deploy.sh via SSM</h3><p>Pull da imagem e docker compose up na EC2</p></div>
+      <div class="arrow"><svg viewBox="0 0 34 24"><path d="M2 12h26M20 4l9 8-9 8" fill="none" stroke="#A8884F" stroke-width="3"/></svg></div>
+      <div class="stack">
+        <div class="step"><div class="n">13</div><h3 data-n="13">Smoke test</h3><p>/health, /tasks e /metrics</p></div>
+        <div class="step fail"><div class="n">!</div><h3 data-n="!">Falhou? Rollback</h3><p>Volta à versão anterior automaticamente</p></div>
+      </div>
+      <div class="arrow"><svg viewBox="0 0 34 24"><path d="M2 12h26M20 4l9 8-9 8" fill="none" stroke="#A8884F" stroke-width="3"/></svg></div>
+      <div class="step" id="s-dast"><div class="n">14</div><h3>DAST</h3><p>OWASP ZAP na aplicação publicada</p></div>
+    </div>
+  </div>
+
+  <div class="lane ops" id="lane-ops">
+    <div class="tag">OPERAÇÃO<small>· monitoramento, logs e feedback</small></div>
+    <div class="steps">
+      <div class="step" id="s-prod"><div class="n">15</div><h3>Produção</h3><p>EC2 com containers (Terraform)</p></div>
+      <div class="arrow"><svg viewBox="0 0 34 24"><path d="M2 12h26M20 4l9 8-9 8" fill="none" stroke="#2F7A5E" stroke-width="3"/></svg></div>
+      <div class="step"><div class="n">16</div><h3>Métricas</h3><p>Prometheus coleta /metrics a cada 15 s</p></div>
+      <div class="arrow"><svg viewBox="0 0 34 24"><path d="M2 12h26M20 4l9 8-9 8" fill="none" stroke="#2F7A5E" stroke-width="3"/></svg></div>
+      <div class="step"><div class="n">17</div><h3>Dashboards e alertas</h3><p>Grafana · API fora, erro 5xx, latência p95</p></div>
+      <div class="arrow"><svg viewBox="0 0 34 24"><path d="M2 12h26M20 4l9 8-9 8" fill="none" stroke="#2F7A5E" stroke-width="3"/></svg></div>
+      <div class="step"><div class="n">18</div><h3>Logs centralizados</h3><p>Logs JSON no CloudWatch Logs</p></div>
+      <div class="arrow"><svg viewBox="0 0 34 24"><path d="M2 12h26M20 4l9 8-9 8" fill="none" stroke="#2F7A5E" stroke-width="3"/></svg></div>
+      <div class="step"><div class="n">19</div><h3>Alarmes</h3><p>CPU, status check e 5xx com e&#8209;mail via SNS</p></div>
+      <div class="arrow"><svg viewBox="0 0 34 24"><path d="M2 12h26M20 4l9 8-9 8" fill="none" stroke="#2F7A5E" stroke-width="3"/></svg></div>
+      <div class="step" id="s-feedback"><div class="n">20</div><h3>Feedback contínuo</h3><p>Dados voltam ao planejamento do próximo ciclo</p></div>
+    </div>
+  </div>
+</div>
+<svg class="overlay" id="ov" width="2400" height="1088" viewBox="0 0 2400 1088"></svg>
+<script>
+  // Conectores entre as raias: fim da CI -> início da CD; fim da CD -> início da Operação
+  const ov = document.getElementById('ov');
+  const r = id => document.getElementById(id).getBoundingClientRect();
+  function connector(fromId, toId, color, label) {
+    const a = r(fromId), b = r(toId);
+    const x1 = a.left + a.width / 2, y1 = a.bottom;
+    const midY = (a.bottom + b.top) / 2 - 8;
+    const gutter = 18, yc = b.top + b.height / 2, x2 = b.left;
+    // Desce, contorna pela margem esquerda e entra pela lateral do primeiro card da raia seguinte
+    const d = `M${x1} ${y1} V${midY} H${gutter} V${yc} H${x2 - 6}`;
+    ov.insertAdjacentHTML('beforeend',
+      `<path d="${d}" fill="none" stroke="${color}" stroke-width="3.5" stroke-dasharray="10 7"/>` +
+      `<path d="M${x2 - 17} ${yc - 9} L${x2 - 3} ${yc} L${x2 - 17} ${yc + 9}" fill="none" stroke="${color}" stroke-width="3.5"/>`);
+    const lx = 1200;
+    ov.insertAdjacentHTML('beforeend',
+      `<rect x="${lx - 175}" y="${midY - 17}" width="350" height="34" rx="17" fill="#fff" stroke="${color}" stroke-width="2"/>` +
+      `<text x="${lx}" y="${midY + 6}" text-anchor="middle" font-family="Arial" font-size="17" font-weight="700" fill="${color}">${label}</text>`);
+  }
+  connector('s-compose', 's-ecr', '#3E4080', 'CI aprovada na branch main');
+  connector('s-dast', 's-prod', '#A8884F', 'Versão publicada em produção');
+</script>
+</body>
+</html>

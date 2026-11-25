@@ -66,3 +66,54 @@ def test_remove_tarefa():
 
 def test_remove_tarefa_inexistente_retorna_404():
     assert client.delete("/tasks/7").status_code == 404
+
+
+def test_health_informa_versao():
+    assert "version" in client.get("/health").json()
+
+
+def test_metrics_expoe_formato_prometheus():
+    client.get("/health")
+    resp = client.get("/metrics")
+    assert resp.status_code == 200
+    assert "text/plain" in resp.headers["content-type"]
+    assert "http_requests_total" in resp.text
+    assert "http_request_duration_seconds" in resp.text
+
+
+def test_metrics_usa_template_da_rota():
+    client.post("/tasks", json={"title": "Monitorar"})
+    client.get("/tasks/1")
+    body = client.get("/metrics").text
+    assert 'path="/tasks/{task_id}"' in body
+    assert 'path="/tasks/1"' not in body
+
+
+def test_gauge_de_tarefas_acompanha_crud():
+    client.post("/tasks", json={"title": "a"})
+    client.post("/tasks", json={"title": "b"})
+    client.delete("/tasks/1")
+    assert "tasks_stored 1.0" in client.get("/metrics").text
+
+
+def test_log_estruturado_em_json():
+    import io
+    import json
+    import logging
+
+    from app.observability import JsonFormatter, get_logger
+
+    buffer = io.StringIO()
+    handler = logging.StreamHandler(buffer)
+    handler.setFormatter(JsonFormatter())
+    logger = get_logger()
+    logger.addHandler(handler)
+    try:
+        client.get("/health")
+    finally:
+        logger.removeHandler(handler)
+
+    registro = json.loads(buffer.getvalue().splitlines()[-1])
+    assert registro["path"] == "/health"
+    assert registro["status"] == 200
+    assert "duration_ms" in registro

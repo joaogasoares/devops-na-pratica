@@ -6,12 +6,16 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 5.0"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.6"
+    }
   }
 
   # Estado remoto (descomente após criar o bucket S3 e a tabela DynamoDB de lock)
   # backend "s3" {
   #   bucket         = "devops-na-pratica-tfstate"
-  #   key            = "fase1/terraform.tfstate"
+  #   key            = "fase2/terraform.tfstate"
   #   region         = "us-east-1"
   #   dynamodb_table = "devops-na-pratica-tflock"
   #   encrypt        = true
