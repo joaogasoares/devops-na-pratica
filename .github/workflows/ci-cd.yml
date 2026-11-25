@@ -124,7 +124,7 @@ jobs:
           -t ${{ env.LOCAL_IMAGE }} .
 
       - name: Scan da imagem (Trivy) - relatório HIGH/CRITICAL
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: ${{ env.LOCAL_IMAGE }}
           severity: HIGH,CRITICAL
@@ -132,7 +132,7 @@ jobs:
           exit-code: "0"
 
       - name: Scan da imagem (Trivy) - bloqueia CRITICAL
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: ${{ env.LOCAL_IMAGE }}
           severity: CRITICAL
