@@ -40,6 +40,18 @@ docker compose up -d --build
 # API: http://localhost:8000  |  Prometheus: http://localhost:9090  |  Grafana: http://localhost:3000 (admin / admin-local)
 ```
 
+### Dependências travadas
+
+As dependências diretas ficam em `requirements.in` e `requirements-dev.in`. Os arquivos
+`requirements*.txt` são gerados a partir deles, com todas as versões fixadas e o hash de cada pacote.
+O pipeline e o Dockerfile instalam com `--require-hashes --only-binary=:all:`. Assim nenhum pacote
+alterado ou script de instalação é executado. Depois de editar um `.in`, regenere os locks:
+
+```bash
+uv pip compile requirements.in --universal --python-version 3.11 --generate-hashes --only-binary :all: -o requirements.txt
+uv pip compile requirements-dev.in --universal --python-version 3.11 --generate-hashes --only-binary :all: -o requirements-dev.txt
+```
+
 ## Qualidade e segurança (executados no pipeline)
 
 ```bash

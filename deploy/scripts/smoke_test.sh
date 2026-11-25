@@ -10,7 +10,7 @@ for i in $(seq 1 "$TENTATIVAS"); do
   if curl -fsS "$BASE_URL/health" > /dev/null 2>&1; then
     break
   fi
-  [ "$i" -eq "$TENTATIVAS" ] && { echo "[smoke] /health não respondeu em $BASE_URL"; exit 1; }
+  [[ "$i" -eq "$TENTATIVAS" ]] && { echo "[smoke] /health não respondeu em $BASE_URL"; exit 1; }
   sleep 3
 done
 

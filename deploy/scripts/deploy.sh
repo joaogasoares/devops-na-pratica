@@ -43,13 +43,13 @@ docker compose -f "$COMPOSE_FILE" -p "$PROJECT_NAME" up -d --remove-orphans
 
 if "$APP_DIR/scripts/smoke_test.sh" "http://localhost:8000"; then
   echo "$IMAGE" > "$STATE_DIR/current_image"
-  [ -n "$PREVIOUS_IMAGE" ] && [ "$PREVIOUS_IMAGE" != "$IMAGE" ] && echo "$PREVIOUS_IMAGE" > "$STATE_DIR/previous_image"
+  [[ -n "$PREVIOUS_IMAGE" && "$PREVIOUS_IMAGE" != "$IMAGE" ]] && echo "$PREVIOUS_IMAGE" > "$STATE_DIR/previous_image"
   echo "$(date -u +%FT%TZ) $IMAGE" >> "$STATE_DIR/history.log"
   docker image prune -f > /dev/null
   log "Deploy concluído com sucesso: $IMAGE"
 else
   log "Smoke test falhou para $IMAGE"
-  if [ -n "$PREVIOUS_IMAGE" ]; then
+  if [[ -n "$PREVIOUS_IMAGE" ]]; then
     log "Iniciando rollback automático para $PREVIOUS_IMAGE"
     APP_IMAGE="$PREVIOUS_IMAGE" docker compose -f "$COMPOSE_FILE" -p "$PROJECT_NAME" up -d
     "$APP_DIR/scripts/smoke_test.sh" "http://localhost:8000" && log "Rollback concluído"

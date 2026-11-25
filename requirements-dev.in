@@ -1,0 +1,7 @@
+-r requirements.in
+httpx2==2.13.1
+pytest==9.2.0
+pytest-cov==7.1.0
+ruff==0.17.6
+bandit==1.9.4
+pip-audit==2.10.1

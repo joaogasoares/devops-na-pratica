@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
+<title>Fluxograma do pipeline DevOps</title>
 <style>
   :root {
     --navy: #3E4080; --navy-soft: #EEEEFC; --gold: #A8884F; --gold-soft: #F7F0E3;
@@ -52,19 +53,19 @@
     <div class="tag">INTEGRAÇÃO CONTÍNUA<small>· todo push e Pull Request</small></div>
     <div class="steps">
       <div class="step" id="s-push"><div class="n">1</div><h3>Commit / PR</h3><p>Desenvolvedor envia o código ao GitHub</p></div>
-      <div class="arrow"><svg viewBox="0 0 34 24"><path d="M2 12h26M20 4l9 8-9 8" fill="none" stroke="#3E4080" stroke-width="3"/></svg></div>
+      <div class="arrow"><svg aria-hidden="true" viewBox="0 0 34 24"><path d="M2 12h26M20 4l9 8-9 8" fill="none" stroke="#3E4080" stroke-width="3"/></svg></div>
       <div class="step"><div class="n">2</div><h3>Lint</h3><p>ruff check e ruff format</p></div>
-      <div class="arrow"><svg viewBox="0 0 34 24"><path d="M2 12h26M20 4l9 8-9 8" fill="none" stroke="#3E4080" stroke-width="3"/></svg></div>
+      <div class="arrow"><svg aria-hidden="true" viewBox="0 0 34 24"><path d="M2 12h26M20 4l9 8-9 8" fill="none" stroke="#3E4080" stroke-width="3"/></svg></div>
       <div class="stack">
         <div class="step"><div class="n">3</div><h3 data-n="3">Testes</h3><p>pytest · 15 testes · cobertura ≥ 80%</p></div>
         <div class="step"><div class="n">4</div><h3 data-n="4">SAST e dependências</h3><p>Bandit · pip-audit</p></div>
         <div class="step"><div class="n">5</div><h3 data-n="5">IaC</h3><p>terraform fmt/validate · Checkov</p></div>
       </div>
-      <div class="arrow"><svg viewBox="0 0 34 24"><path d="M2 12h26M20 4l9 8-9 8" fill="none" stroke="#3E4080" stroke-width="3"/></svg></div>
+      <div class="arrow"><svg aria-hidden="true" viewBox="0 0 34 24"><path d="M2 12h26M20 4l9 8-9 8" fill="none" stroke="#3E4080" stroke-width="3"/></svg></div>
       <div class="step"><div class="n">6</div><h3>Build Docker</h3><p>Imagem multi&#8209;stage, usuário não&#8209;root, tag = SHA do commit</p></div>
-      <div class="arrow"><svg viewBox="0 0 34 24"><path d="M2 12h26M20 4l9 8-9 8" fill="none" stroke="#3E4080" stroke-width="3"/></svg></div>
+      <div class="arrow"><svg aria-hidden="true" viewBox="0 0 34 24"><path d="M2 12h26M20 4l9 8-9 8" fill="none" stroke="#3E4080" stroke-width="3"/></svg></div>
       <div class="step"><div class="n">7</div><h3>Scan da imagem</h3><p>Trivy bloqueia vulnerabilidades críticas</p></div>
-      <div class="arrow"><svg viewBox="0 0 34 24"><path d="M2 12h26M20 4l9 8-9 8" fill="none" stroke="#3E4080" stroke-width="3"/></svg></div>
+      <div class="arrow"><svg aria-hidden="true" viewBox="0 0 34 24"><path d="M2 12h26M20 4l9 8-9 8" fill="none" stroke="#3E4080" stroke-width="3"/></svg></div>
       <div class="step" id="s-compose"><div class="n">8</div><h3>Docker Compose</h3><p>API + Prometheus + Grafana no runner e smoke test</p></div>
     </div>
   </div>
@@ -73,18 +74,18 @@
     <div class="tag">ENTREGA CONTÍNUA<small>· somente branch main</small></div>
     <div class="steps">
       <div class="step" id="s-ecr"><div class="n">9</div><h3>Publicação</h3><p>Imagem enviada ao Amazon ECR (OIDC, sem chaves fixas)</p></div>
-      <div class="arrow"><svg viewBox="0 0 34 24"><path d="M2 12h26M20 4l9 8-9 8" fill="none" stroke="#A8884F" stroke-width="3"/></svg></div>
+      <div class="arrow"><svg aria-hidden="true" viewBox="0 0 34 24"><path d="M2 12h26M20 4l9 8-9 8" fill="none" stroke="#A8884F" stroke-width="3"/></svg></div>
       <div class="step"><div class="n">10</div><h3>Aprovação manual</h3><p>Ambiente <i>production</i> no GitHub</p></div>
-      <div class="arrow"><svg viewBox="0 0 34 24"><path d="M2 12h26M20 4l9 8-9 8" fill="none" stroke="#A8884F" stroke-width="3"/></svg></div>
+      <div class="arrow"><svg aria-hidden="true" viewBox="0 0 34 24"><path d="M2 12h26M20 4l9 8-9 8" fill="none" stroke="#A8884F" stroke-width="3"/></svg></div>
       <div class="step"><div class="n">11</div><h3>Artefatos no S3</h3><p>Compose, scripts e configs de monitoramento</p></div>
-      <div class="arrow"><svg viewBox="0 0 34 24"><path d="M2 12h26M20 4l9 8-9 8" fill="none" stroke="#A8884F" stroke-width="3"/></svg></div>
+      <div class="arrow"><svg aria-hidden="true" viewBox="0 0 34 24"><path d="M2 12h26M20 4l9 8-9 8" fill="none" stroke="#A8884F" stroke-width="3"/></svg></div>
       <div class="step"><div class="n">12</div><h3>deploy.sh via SSM</h3><p>Pull da imagem e docker compose up na EC2</p></div>
-      <div class="arrow"><svg viewBox="0 0 34 24"><path d="M2 12h26M20 4l9 8-9 8" fill="none" stroke="#A8884F" stroke-width="3"/></svg></div>
+      <div class="arrow"><svg aria-hidden="true" viewBox="0 0 34 24"><path d="M2 12h26M20 4l9 8-9 8" fill="none" stroke="#A8884F" stroke-width="3"/></svg></div>
       <div class="stack">
         <div class="step"><div class="n">13</div><h3 data-n="13">Smoke test</h3><p>/health, /tasks e /metrics</p></div>
         <div class="step fail"><div class="n">!</div><h3 data-n="!">Falhou? Rollback</h3><p>Volta à versão anterior automaticamente</p></div>
       </div>
-      <div class="arrow"><svg viewBox="0 0 34 24"><path d="M2 12h26M20 4l9 8-9 8" fill="none" stroke="#A8884F" stroke-width="3"/></svg></div>
+      <div class="arrow"><svg aria-hidden="true" viewBox="0 0 34 24"><path d="M2 12h26M20 4l9 8-9 8" fill="none" stroke="#A8884F" stroke-width="3"/></svg></div>
       <div class="step" id="s-dast"><div class="n">14</div><h3>DAST</h3><p>OWASP ZAP na aplicação publicada</p></div>
     </div>
   </div>
@@ -93,20 +94,20 @@
     <div class="tag">OPERAÇÃO<small>· monitoramento, logs e feedback</small></div>
     <div class="steps">
       <div class="step" id="s-prod"><div class="n">15</div><h3>Produção</h3><p>EC2 com containers (Terraform)</p></div>
-      <div class="arrow"><svg viewBox="0 0 34 24"><path d="M2 12h26M20 4l9 8-9 8" fill="none" stroke="#2F7A5E" stroke-width="3"/></svg></div>
+      <div class="arrow"><svg aria-hidden="true" viewBox="0 0 34 24"><path d="M2 12h26M20 4l9 8-9 8" fill="none" stroke="#2F7A5E" stroke-width="3"/></svg></div>
       <div class="step"><div class="n">16</div><h3>Métricas</h3><p>Prometheus coleta /metrics a cada 15 s</p></div>
-      <div class="arrow"><svg viewBox="0 0 34 24"><path d="M2 12h26M20 4l9 8-9 8" fill="none" stroke="#2F7A5E" stroke-width="3"/></svg></div>
+      <div class="arrow"><svg aria-hidden="true" viewBox="0 0 34 24"><path d="M2 12h26M20 4l9 8-9 8" fill="none" stroke="#2F7A5E" stroke-width="3"/></svg></div>
       <div class="step"><div class="n">17</div><h3>Dashboards e alertas</h3><p>Grafana · API fora, erro 5xx, latência p95</p></div>
-      <div class="arrow"><svg viewBox="0 0 34 24"><path d="M2 12h26M20 4l9 8-9 8" fill="none" stroke="#2F7A5E" stroke-width="3"/></svg></div>
+      <div class="arrow"><svg aria-hidden="true" viewBox="0 0 34 24"><path d="M2 12h26M20 4l9 8-9 8" fill="none" stroke="#2F7A5E" stroke-width="3"/></svg></div>
       <div class="step"><div class="n">18</div><h3>Logs centralizados</h3><p>Logs JSON no CloudWatch Logs</p></div>
-      <div class="arrow"><svg viewBox="0 0 34 24"><path d="M2 12h26M20 4l9 8-9 8" fill="none" stroke="#2F7A5E" stroke-width="3"/></svg></div>
+      <div class="arrow"><svg aria-hidden="true" viewBox="0 0 34 24"><path d="M2 12h26M20 4l9 8-9 8" fill="none" stroke="#2F7A5E" stroke-width="3"/></svg></div>
       <div class="step"><div class="n">19</div><h3>Alarmes</h3><p>CPU, status check e 5xx com e&#8209;mail via SNS</p></div>
-      <div class="arrow"><svg viewBox="0 0 34 24"><path d="M2 12h26M20 4l9 8-9 8" fill="none" stroke="#2F7A5E" stroke-width="3"/></svg></div>
+      <div class="arrow"><svg aria-hidden="true" viewBox="0 0 34 24"><path d="M2 12h26M20 4l9 8-9 8" fill="none" stroke="#2F7A5E" stroke-width="3"/></svg></div>
       <div class="step" id="s-feedback"><div class="n">20</div><h3>Feedback contínuo</h3><p>Dados voltam ao planejamento do próximo ciclo</p></div>
     </div>
   </div>
 </div>
-<svg class="overlay" id="ov" width="2400" height="1088" viewBox="0 0 2400 1088"></svg>
+<svg aria-hidden="true" class="overlay" id="ov" width="2400" height="1088" viewBox="0 0 2400 1088"></svg>
 <script>
   // Conectores entre as raias: fim da CI -> início da CD; fim da CD -> início da Operação
   const ov = document.getElementById('ov');

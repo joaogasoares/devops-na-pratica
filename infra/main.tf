@@ -42,7 +42,7 @@ resource "aws_ecr_lifecycle_policy" "app" {
 # ---------------------------------------------------------------
 # Bucket com os artefatos de deploy (compose, scripts, configs)
 # ---------------------------------------------------------------
-resource "aws_s3_bucket" "deploy" {
+resource "aws_s3_bucket" "deploy" { # NOSONAR(S6258): log de acesso dispensado, ver justificativa CKV_AWS_18
   #checkov:skip=CKV_AWS_18:Bucket interno só de artefatos de deploy; acessos já auditados pelo CloudTrail
   #checkov:skip=CKV_AWS_144:Artefatos são reproduzíveis a partir do Git; replicação entre regiões desnecessária
   #checkov:skip=CKV_AWS_145:SSE-S3 (AES256) habilitado; KMS dedicado fica como melhoria futura
@@ -57,6 +57,25 @@ resource "aws_s3_bucket_public_access_block" "deploy" {
   block_public_policy     = true
   ignore_public_acls      = true
   restrict_public_buckets = true
+}
+
+# Recusa qualquer acesso ao bucket que não use HTTPS (TLS)
+resource "aws_s3_bucket_policy" "deploy_https_only" {
+  bucket = aws_s3_bucket.deploy.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Sid       = "DenyInsecureTransport"
+      Effect    = "Deny"
+      Principal = "*"
+      Action    = "s3:*"
+      Resource  = [aws_s3_bucket.deploy.arn, "${aws_s3_bucket.deploy.arn}/*"]
+      Condition = { Bool = { "aws:SecureTransport" = "false" } }
+    }]
+  })
+
+  depends_on = [aws_s3_bucket_public_access_block.deploy]
 }
 
 resource "aws_s3_bucket_versioning" "deploy" {
@@ -181,7 +200,7 @@ data "aws_ami" "amazon_linux" {
 # ---------------------------------------------------------------
 # Servidor da aplicação: Docker + Docker Compose; o deploy é feito pelo pipeline
 # ---------------------------------------------------------------
-resource "aws_instance" "app" {
+resource "aws_instance" "app" { # NOSONAR(S6329): IP público intencional, a API é servida direto da EC2; portas restritas no security group
   #checkov:skip=CKV_AWS_126:Monitoramento básico (5 min) + Prometheus na própria instância; detalhado gera custo extra
   ami                    = data.aws_ami.amazon_linux.id
   instance_type          = var.instance_type

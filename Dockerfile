@@ -3,7 +3,7 @@ FROM python:3.12-slim AS builder
 
 WORKDIR /build
 COPY requirements.txt .
-RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+RUN pip install --no-cache-dir --require-hashes --only-binary=:all: --prefix=/install -r requirements.txt
 
 # ---------- Estágio 2: imagem final enxuta ----------
 FROM python:3.12-slim
